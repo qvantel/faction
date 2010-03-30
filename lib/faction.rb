@@ -18,7 +18,6 @@ module Faction #:nodoc:
   # * <tt>:forwarded_for</tt> - <tt>ValidationFactor.X_FORWARDED_FOR</tt>
   # * <tt>:random_number</tt> - <tt>ValidationFactor.RANDOM_NUMBER</tt>
   # * <tt>:name</tt> - <tt>ValidationFactor.NAME</tt>
-  
   class Client
     @@debug = false
 
