@@ -1,32 +1,45 @@
 require 'openssl'
 require 'savon'
 
-module Faction
+module Faction #:nodoc:
+
+  # Exception base for Faction
   class Exception < ::Exception; end
+  # Any sort of Exception from Crowd
   class AuthenticationException < Exception; end
 
+  # See http://docs.atlassian.com/crowd/current/com/atlassian/crowd/integration/service/soap/client/SecurityServerClient.html
+  # for Crowd SOAP API documentation.
+  #
+  # The <tt>validation_factors</tt> parameter is a <tt>Hash</tt> that can contain the following keys:
+  # * <tt>:user_agent</tt> - <tt>ValidationFactor.USER_AGENT</tt>
+  # * <tt>:remote_address</tt> - <tt>ValidationFactor.REMOTE_ADDRESS</tt>
+  # * <tt>:remote_host</tt> - <tt>ValidationFactor.REMOTE_HOST</tt>
+  # * <tt>:forwarded_for</tt> - <tt>ValidationFactor.X_FORWARDED_FOR</tt>
+  # * <tt>:random_number</tt> - <tt>ValidationFactor.RANDOM_NUMBER</tt>
+  # * <tt>:name</tt> - <tt>ValidationFactor.NAME</tt>
+  
   class Client
     @@debug = false
 
+    # Sets the global debugging for Client
     def self.debug=(value)
       @@debug = value
     end
 
+    # True if Faction is in debug mode
     def self.debug?
       @@debug
     end
 
-    CROWD_NAMESPACES = {
-      'xmlns:wsdl' => 'urn:SecurityServer',
-      'xmlns:auth' => 'http://authentication.integration.crowd.atlassian.com',
-      'xmlns:xsd'  => 'http://www.w3.org/2001/XMLSchema',
-      'xmlns:xsi'  => 'http://www.w3.org/2001/XMLSchema-instance'
-    }
-
+    # Url of the Crowd SecurityServer
     attr_reader :crowd_url
+    # Application name
     attr_reader :app_name
+    # Appliction password
     attr_reader :app_password
 
+    # Instantiates a new client using a "standard" <tt>crowd.properties</tt> file.
     def self.from_properties(properties_file)
       props = Hash[*open(properties_file).readlines.map {|line|
                      line.split(/=/, 2).map(&:strip)}.flatten]
@@ -36,6 +49,20 @@ module Faction
                :verify_cert => ['yes', 'true'].include?(props['ssl.verify']))
     end
 
+    # Creates a new Crowd client.
+    #
+    # Parameters:
+    # * <tt>crowd_url</tt> - The URL to Crowd SecurityServer.
+    # * <tt>app_name</tt> - Application name.
+    # * <tt>app_password</tt> - Application password.
+    # * <tt>options</tt> - A Hash of options (described below).
+    #
+    # Options
+    # * <tt>:verify_cert</tt> - If <tt>false</tt> the peer SSL certificate is not verified.
+    #
+    # Example:
+    #   Faction::Client.new('http://localhost:8085/crowd/services/SecurityServer', 'application', 'password')
+    #
     def initialize(crowd_url, app_name, app_password, options = {})
       @crowd_url = crowd_url
       @crowd = Savon::Client.new(@crowd_url + (Client.debug? ? '?wsdl' : ''))
@@ -47,6 +74,7 @@ module Faction
       @app_token = nil
     end
 
+    # See <tt>SecurityServerClient.authenticatePrincipal</tt>
     def authenticate_principal(name, password, validation_factors = nil)
       authenticated_crowd_call(:authenticate_principal,
                                 { 'auth:application' => app_name,
@@ -55,28 +83,38 @@ module Faction
                                   'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
-    def invalidate_principal_token(token)
-      authenticated_crowd_call(:invalidate_principal_token, token) && nil
+    # See <tt>SecurityServerClient.invalidateToken</tt>
+    def invalidate_token(token)
+      authenticated_crowd_call(:invalidate_token, token) && nil
     end
 
+    # See <tt>SecurityServerClient.getCookieInfo</tt>
     def get_cookie_info
       authenticated_crowd_call(:get_cookie_info)
     end
 
-    def valid_principal_token?(token, validation_factors = nil)
-      authenticated_crowd_call(:is_valid_principal_token,
+    # See <tt>SecurityServerClient.isValidToken</tt>
+    def valid_token?(token, validation_factors = nil)
+      authenticated_crowd_call(:is_valid_token,
                                token,
                                {'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
     private
 
-    USER_AGENT      = "User-Agent"
-    REMOTE_ADDRESS  = "remote_address"
-    REMOTE_HOST     = "remote_host"
-    X_FORWARDED_FOR = "X-Forwarded-For"
-    RANDOM_NUMBER   = "Random-Number"
-    NAME            = "NAME"
+    CROWD_NAMESPACES = {
+      'xmlns:wsdl' => 'urn:SecurityServer',
+      'xmlns:auth' => 'http://authentication.integration.crowd.atlassian.com',
+      'xmlns:xsd'  => 'http://www.w3.org/2001/XMLSchema',
+      'xmlns:xsi'  => 'http://www.w3.org/2001/XMLSchema-instance'
+    }
+
+    USER_AGENT      = "User-Agent" #:nodoc:
+    REMOTE_ADDRESS  = "remote_address" #:nodoc:
+    REMOTE_HOST     = "remote_host" #:nodoc:
+    X_FORWARDED_FOR = "X-Forwarded-For" #:nodoc:
+    RANDOM_NUMBER   = "Random-Number" #:nodoc:
+    NAME            = "NAME" #:nodoc:
 
     VALIDATION_FACTOR_MAPPING = {
       :user_agent     => USER_AGENT,
