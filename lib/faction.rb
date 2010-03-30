@@ -8,7 +8,7 @@ module Faction #:nodoc:
   # Any sort of Exception from Crowd
   class AuthenticationException < Exception; end
 
-  # See http://docs.atlassian.com/crowd/current/com/atlassian/crowd/integration/service/soap/client/SecurityServerClient.html
+  # See http://docs.atlassian.com/crowd/current/com/atlassian/crowd/integration/service/soap/server/SecurityServer.html
   # for Crowd SOAP API documentation.
   #
   # The <tt>validation_factors</tt> parameter is a <tt>Hash</tt> that can contain the following keys:
@@ -82,9 +82,9 @@ module Faction #:nodoc:
                                   'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
-    # See <tt>SecurityServerClient.invalidateToken</tt>
-    def invalidate_token(token)
-      authenticated_crowd_call(:invalidate_token, token) && nil
+    # See <tt>SecurityServerClient.invalidatePrincipalToken</tt>
+    def invalidate_principal_token(token)
+      authenticated_crowd_call(:invalidate_principal_token, token) && nil
     end
 
     # See <tt>SecurityServerClient.getCookieInfo</tt>
@@ -92,9 +92,9 @@ module Faction #:nodoc:
       authenticated_crowd_call(:get_cookie_info)
     end
 
-    # See <tt>SecurityServerClient.isValidToken</tt>
-    def valid_token?(token, validation_factors = nil)
-      authenticated_crowd_call(:is_valid_token,
+    # See <tt>SecurityServerClient.isValidPrincipalToken</tt>
+    def valid_principal_token?(token, validation_factors = nil)
+      authenticated_crowd_call(:is_valid_principal_token,
                                token,
                                {'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
@@ -171,9 +171,12 @@ module Faction #:nodoc:
       ensure_app_token!
       crowd_call(name) do |soap|
         soap.body = {'wsdl:in0' => app_authentication}
+        order = ['wsdl:in0']
         args.each_with_index do |arg, index|
           soap.body["wsdl:in#{index + 1}"] = arg
+          order << "wsdl:in#{index + 1}"
         end
+        soap.body[:order!] = order
       end
     end
 
