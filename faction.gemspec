@@ -15,6 +15,5 @@ EOF
   s.require_paths = ['lib']
   s.files = FileList["#{s.name}.gemspec", 'lib/**/*.rb', 'lib/**/*.yml'].to_a
 
-  s.add_dependency('openssl')
   s.add_dependency('savon')
 end
