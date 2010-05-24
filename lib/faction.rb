@@ -99,6 +99,13 @@ module Faction #:nodoc:
                                {'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
+    # See <tt>SecurityServer.updatePrincipalCredential</tt>
+    def update_principal_credential(name, new_password)
+      authenticated_crowd_call(:update_principal_credential,
+                               name,
+                               {'auth:credential' => new_password, 'auth:encryptedCredential' => false})
+    end
+
     private
 
     CROWD_NAMESPACES = {
