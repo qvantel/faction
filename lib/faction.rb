@@ -106,6 +106,15 @@ module Faction #:nodoc:
                                {'auth:credential' => new_password, 'auth:encryptedCredential' => false})
     end
 
+    def find_principal_by_token(token)
+      result = authenticated_crowd_call(:find_principal_by_token, token)
+      attributes = result[:attributes][:soap_attribute].inject({}) do |hash, item|
+        hash[item[:name].to_sym] = item[:values][:string]
+        hash
+      end
+      result.merge(:attributes => attributes)
+    end
+
     private
 
     CROWD_NAMESPACES = {
