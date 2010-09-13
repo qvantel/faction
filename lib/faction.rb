@@ -107,12 +107,11 @@ module Faction #:nodoc:
     end
 
     def find_principal_by_token(token)
-      result = authenticated_crowd_call(:find_principal_by_token, token)
-      attributes = result[:attributes][:soap_attribute].inject({}) do |hash, item|
-        hash[item[:name].to_sym] = item[:values][:string]
-        hash
-      end
-      result.merge(:attributes => attributes)
+      fix_principal_attributes(authenticated_crowd_call(:find_principal_by_token, token))
+    end
+
+    def find_principal_by_name(name)
+      fix_principal_attributes(authenticated_crowd_call(:find_principal_by_name, name))
     end
 
     def add_principal_to_group(principal, group)
@@ -212,6 +211,14 @@ module Faction #:nodoc:
           raise AuthenticationException, f.message
         end
       end
+    end
+    
+    def fix_principal_attributes(result)
+      attributes = result[:attributes][:soap_attribute].inject({}) do |hash, item|
+        hash[item[:name].to_sym] = item[:values][:string]
+        hash
+      end
+      result.merge(:attributes => attributes)
     end
   end
 end
