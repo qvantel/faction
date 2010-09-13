@@ -115,6 +115,10 @@ module Faction #:nodoc:
       result.merge(:attributes => attributes)
     end
 
+    def add_principal_to_group(principal, group)
+      authenticated_crowd_call(:add_principal_to_group, principal, group) && nil
+    end
+
     private
 
     CROWD_NAMESPACES = {
