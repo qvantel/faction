@@ -88,8 +88,12 @@ module Faction #:nodoc:
     end
 
     # See <tt>SecurityServerClient.getCookieInfo</tt>
-    def get_cookie_info
+    def cookie_info
       authenticated_crowd_call(:get_cookie_info)
+    end
+
+    def get_cookie_info
+     $stderr.puts('faction: get_cookie_info deprecated, use cookie_info instead')
     end
 
     # See <tt>SecurityServerClient.isValidPrincipalToken</tt>
