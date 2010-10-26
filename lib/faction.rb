@@ -88,8 +88,14 @@ module Faction #:nodoc:
     end
 
     # See <tt>SecurityServerClient.getCookieInfo</tt>
-    def get_cookie_info
+    # Returns a <tt>Hash</tt> containing the cookie info fields.
+    def cookie_info
       authenticated_crowd_call(:get_cookie_info)
+    end
+
+    def get_cookie_info
+      $stderr.puts('faction: get_cookie_info deprecated, use cookie_info instead')
+      cookie_info
     end
 
     # See <tt>SecurityServerClient.isValidPrincipalToken</tt>
@@ -106,13 +112,38 @@ module Faction #:nodoc:
                                {'auth:credential' => new_password, 'auth:encryptedCredential' => false})
     end
 
+    # See <tt>SecurityServer.findPrincipalByToken</tt>
+    # Returns the principal information as a <tt>Hash</tt>.
     def find_principal_by_token(token)
-      result = authenticated_crowd_call(:find_principal_by_token, token)
-      attributes = result[:attributes][:soap_attribute].inject({}) do |hash, item|
-        hash[item[:name].to_sym] = item[:values][:string]
-        hash
-      end
-      result.merge(:attributes => attributes)
+      simplify_soap_attributes(authenticated_crowd_call(:find_principal_by_token, token))
+    end
+
+    def find_principal_by_name(name)
+      simplify_soap_attributes(authenticated_crowd_call(:find_principal_by_name, name))
+    end
+
+    def find_principal_with_attributes_by_name(name)
+      simplify_soap_attributes(authenticated_crowd_call(:find_principal_with_attributes_by_name, name))
+    end
+
+    def group_names
+      authenticated_crowd_call(:find_all_group_names)[:string]
+    end
+
+    def principal_names
+      authenticated_crowd_call(:find_all_principal_names)[:string]
+    end
+
+    def granted_authorities
+      authenticated_crowd_call(:get_granted_authorities)[:string]
+    end
+
+    def cache_enabled?
+      authenticated_crowd_call(:is_cache_enabled)
+    end
+
+    def cache_time
+      authenticated_crowd_call(:get_cache_time)
     end
 
     private
@@ -149,6 +180,14 @@ module Faction #:nodoc:
       {'auth:ValidationFactor' => result}
     end
 
+    def simplify_soap_attributes(soap_object)
+      attributes = soap_object[:attributes][:soap_attribute].inject({}) do |hash, item|
+        hash[item[:name].to_sym] = item[:values][:string]
+        hash
+      end
+      soap_object.merge(:attributes => attributes)
+    end
+
     def app_authentication
       Hash['auth:name'  => app_name,
            'auth:token' => app_token]
@@ -168,6 +207,7 @@ module Faction #:nodoc:
                            'auth:name' => app_name,
                            'auth:credential' => {
                              'auth:credential' => app_password,
+                             'auth:encryptedCredential' => false,
                            }})
       end
       response[:token]
