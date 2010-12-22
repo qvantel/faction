@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.summary = <<EOF
 A simple Savon-based client for Atlassian Crowd
 EOF
-  s.version = '2010.51'
+  s.version = '2010.51.1'
   s.date = '2010-03-30'
 
   s.authors = ['Olli Helenius']
@@ -15,5 +15,5 @@ EOF
   s.require_paths = ['lib']
   s.files = FileList["#{s.name}.gemspec", 'lib/**/*.rb', 'lib/**/*.yml'].to_a
 
-  s.add_dependency('savon', '~> 0.7')
+  s.add_dependency('savon', '< 0.8')
 end
