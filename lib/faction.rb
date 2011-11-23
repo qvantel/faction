@@ -82,6 +82,14 @@ module Faction #:nodoc:
                                   'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
+    # See <tt>SecurityServerClient.createPrincipalToken</tt>
+    def create_principal_token(name, validation_factors = nil)
+      authenticated_crowd_call(:create_principal_token,
+                                { 'auth:application' => app_name,
+                                  'auth:name' => name,
+                                  'auth:validationFactors' => convert_validation_factors(validation_factors)})
+    end
+
     # See <tt>SecurityServerClient.invalidatePrincipalToken</tt>
     def invalidate_principal_token(token)
       authenticated_crowd_call(:invalidate_principal_token, token) && nil
