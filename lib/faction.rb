@@ -139,7 +139,7 @@ module Faction #:nodoc:
     end
 
     def find_group_memberships(name)
-      authenticated_crowd_call(:find_group_memberships, name)[:string]
+      arrayify(authenticated_crowd_call(:find_group_memberships, name)[:string])
     end
 
     def group_names
@@ -210,6 +210,16 @@ module Faction #:nodoc:
 
     def simplify_soap_group(soap_group)
       soap_group.merge(:members => soap_group[:members][:string])
+    end
+
+    def arrayify(soap_object)
+      if soap_object.nil?
+        []
+      elsif soap_object.is_a? String
+        [soap_object]
+      else
+        soap_object
+      end
     end
 
     def app_authentication
