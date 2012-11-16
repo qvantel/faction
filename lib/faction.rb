@@ -82,6 +82,14 @@ module Faction #:nodoc:
                                   'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
+    # See <tt>SecurityServerClient.createPrincipalToken</tt>
+    def create_principal_token(name, validation_factors = nil)
+      authenticated_crowd_call(:create_principal_token,
+                                { 'auth:application' => app_name,
+                                  'auth:name' => name,
+                                  'auth:validationFactors' => convert_validation_factors(validation_factors)})
+    end
+
     # See <tt>SecurityServerClient.invalidatePrincipalToken</tt>
     def invalidate_principal_token(token)
       authenticated_crowd_call(:invalidate_principal_token, token) && nil
@@ -124,6 +132,14 @@ module Faction #:nodoc:
 
     def find_principal_with_attributes_by_name(name)
       simplify_soap_attributes(authenticated_crowd_call(:find_principal_with_attributes_by_name, name))
+    end
+
+    def find_group_by_name(name)
+      simplify_soap_group(authenticated_crowd_call(:find_group_by_name, name))
+    end
+
+    def find_group_memberships(name)
+      authenticated_crowd_call(:find_group_memberships, name)[:string]
     end
 
     def group_names
@@ -190,6 +206,10 @@ module Faction #:nodoc:
         hash
       end
       soap_object.merge(:attributes => attributes)
+    end
+
+    def simplify_soap_group(soap_group)
+      soap_group.merge(:members => soap_group[:members][:string])
     end
 
     def app_authentication
