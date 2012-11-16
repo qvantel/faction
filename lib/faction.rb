@@ -134,6 +134,14 @@ module Faction #:nodoc:
       simplify_soap_attributes(authenticated_crowd_call(:find_principal_with_attributes_by_name, name))
     end
 
+    def find_group_by_name(name)
+      simplify_soap_group(authenticated_crowd_call(:find_group_by_name, name))
+    end
+
+    def find_group_memberships(name)
+      authenticated_crowd_call(:find_group_memberships, name)[:string]
+    end
+
     def group_names
       authenticated_crowd_call(:find_all_group_names)[:string]
     end
@@ -198,6 +206,10 @@ module Faction #:nodoc:
         hash
       end
       soap_object.merge(:attributes => attributes)
+    end
+
+    def simplify_soap_group(soap_group)
+      soap_group.merge(:members => soap_group[:members][:string])
     end
 
     def app_authentication
