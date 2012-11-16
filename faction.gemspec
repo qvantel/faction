@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.summary = <<EOF
 A simple Savon-based client for Atlassian Crowd
 EOF
-  s.version = '2010.51.1'
-  s.date = '2010-03-30'
+  s.version = '2012.46'
+  s.date = '2012-11-16'
 
   s.authors = ['Olli Helenius']
   s.email = ['olli.helenius@onesto.fi']
