@@ -1,4 +1,4 @@
-Copyright (c) 2013 Olli Helenius
+Copyright (c) 2013 Onesto Services Oy
 
 MIT License
 
