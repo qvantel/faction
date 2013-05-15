@@ -42,4 +42,4 @@ end
 
 ## License
 
-Ruby on Rails is released under the [MIT License](http://opensource.org/licenses/MIT).
+Faction is released under the [MIT License](http://opensource.org/licenses/MIT).
