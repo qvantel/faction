@@ -217,10 +217,10 @@ module Faction #:nodoc:
     def arrayify(soap_object)
       if soap_object.nil?
         []
-      elsif soap_object.is_a? String
-        [soap_object]
-      else
+      elsif soap_object.is_a? Array
         soap_object
+      else
+        [soap_object]
       end
     end
 
