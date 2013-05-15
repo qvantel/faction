@@ -1,5 +1,7 @@
 require 'openssl'
 require 'savon'
+require "faction/version"
+
 
 module Faction #:nodoc:
 
@@ -35,7 +37,7 @@ module Faction #:nodoc:
     attr_reader :crowd_url
     # Application name
     attr_reader :app_name
-    # Appliction password
+    # Application password
     attr_reader :app_password
 
     # Instantiates a new client using a "standard" <tt>crowd.properties</tt> file.
