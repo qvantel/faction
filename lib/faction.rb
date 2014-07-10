@@ -80,7 +80,7 @@ module Faction #:nodoc:
       authenticated_crowd_call(:authenticate_principal,
                                 { 'auth:application' => app_name,
                                   'auth:name' => name,
-                                  'auth:credential' => {'auth:credential' => password},
+                                  'auth:credential' => {'auth:credential' => password, 'auth:encryptedCredential' => false},
                                   'auth:validationFactors' => convert_validation_factors(validation_factors)})
     end
 
