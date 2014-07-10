@@ -168,11 +168,33 @@ module Faction #:nodoc:
       authenticated_crowd_call(:add_principal_to_group, principal, group) && nil
     end
 
+    def remove_principal(principal)
+      authenticated_crowd_call(:remove_principal, principal) && nil
+    end
+
+    def add_principal(username, password, description, active, attributes)
+      soap_attributes = attributes.map do |name, value|
+        {'p:SOAPAttribute' => {'p:name' => name, 'p:values' => {'wsdl:string' => value}}}
+      end
+      soap_principal = {
+          'p:active'      => active,
+          'p:name'        => username,
+          'p:description' => description,
+          'p:attributes'  => soap_attributes
+      }
+      credential = {
+          'auth:credential'          => password,
+          'auth:encryptedCredential' => false
+      }
+      simplify_soap_attributes(authenticated_crowd_call(:add_principal, soap_principal, credential))
+    end
+
     private
 
     CROWD_NAMESPACES = {
       'xmlns:wsdl' => 'urn:SecurityServer',
       'xmlns:auth' => 'http://authentication.integration.crowd.atlassian.com',
+      'xmlns:p'    => 'http://soap.integration.crowd.atlassian.com',
       'xmlns:xsd'  => 'http://www.w3.org/2001/XMLSchema',
       'xmlns:xsi'  => 'http://www.w3.org/2001/XMLSchema-instance'
     }
