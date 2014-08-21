@@ -174,13 +174,13 @@ module Faction #:nodoc:
 
     def add_principal(username, password, description, active, attributes)
       soap_attributes = attributes.map do |name, value|
-        {'p:SOAPAttribute' => {'p:name' => name, 'p:values' => {'wsdl:string' => value}}}
+        {'p:name' => name, 'p:values' => {'wsdl:string' => value}}
       end
       soap_principal = {
           'p:active'      => active,
           'p:name'        => username,
           'p:description' => description,
-          'p:attributes'  => soap_attributes
+          'p:attributes'  => {'p:SOAPAttribute' => soap_attributes}
       }
       credential = {
           'auth:credential'          => password,
