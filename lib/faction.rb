@@ -110,9 +110,14 @@ module Faction #:nodoc:
 
     # See <tt>SecurityServerClient.isValidPrincipalToken</tt>
     def valid_principal_token?(token, validation_factors = nil)
-      authenticated_crowd_call(:is_valid_principal_token,
+      if (validation_factors.nil? || validation_factors.empty?)
+        authenticated_crowd_call(:is_valid_principal_token,
+                               token)
+      else
+        authenticated_crowd_call(:is_valid_principal_token,
                                token,
                                {'auth:validationFactors' => convert_validation_factors(validation_factors)})
+      end
     end
 
     # See <tt>SecurityServer.updatePrincipalCredential</tt>
